@@ -65,8 +65,10 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
     });
 
     await booking.save();
-    const populated = await booking.populate('serviceProviderId', 'businessName hourlyRate')
-      .populate('customerId', 'firstName lastName');
+    const populated = await booking.populate([
+      { path: 'serviceProviderId', select: 'businessName hourlyRate' },
+      { path: 'customerId', select: 'firstName lastName' }
+    ]);
 
     res.status(201).json(populated);
   } catch (error: any) {
@@ -78,11 +80,16 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
 router.get('/my-bookings', authenticate, async (req: AuthRequest, res) => {
   try {
     let query: any = {};
-    
+
     if (req.userRole === 'customer') {
       query.customerId = req.userId;
     } else {
-      query.serviceProviderId = req.userId;
+      // Find the ServiceProvider profile for this user
+      const provider = await ServiceProvider.findOne({ userId: req.userId });
+      if (!provider) {
+        return res.json([]); // No profile = no bookings
+      }
+      query.serviceProviderId = provider._id;
     }
 
     const bookings = await Booking.find(query)
@@ -107,9 +114,14 @@ router.get('/:id', authenticate, async (req: AuthRequest, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // Check authorization
-    if (!compareObjectIds(booking.customerId, req.userId) && 
-        !compareObjectIds(booking.serviceProviderId, req.userId)) {
+    // Check authorization: Must be the customer OR the user associated with the ServiceProvider profile
+    const isCustomer = compareObjectIds(booking.customerId, req.userId);
+
+    // For the provider, we need to check if the User ID of the ServiceProvider profile matches the requesting user's ID
+    const providerProfile = booking.serviceProviderId as any;
+    const isProvider = providerProfile && compareObjectIds(providerProfile.userId, req.userId);
+
+    if (!isCustomer && !isProvider) {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
@@ -130,18 +142,20 @@ router.patch('/:id/status', authenticate, async (req: AuthRequest, res) => {
     }
 
     // Service providers can update to confirmed, in_progress, or completed
-    if (req.userRole === 'service_provider' && 
-        compareObjectIds(booking.serviceProviderId, req.userId)) {
-      if (['confirmed', 'in_progress', 'completed'].includes(status)) {
-        booking.status = status as any;
-        await booking.save();
-        return res.json(booking);
+    if (req.userRole === 'service_provider') {
+      const provider = await ServiceProvider.findOne({ userId: req.userId });
+      if (provider && compareObjectIds(booking.serviceProviderId, provider._id)) {
+        if (['confirmed', 'in_progress', 'completed'].includes(status)) {
+          booking.status = status as any;
+          await booking.save();
+          return res.json(booking);
+        }
       }
     }
 
     // Customers can cancel
-    if (req.userRole === 'customer' && 
-        compareObjectIds(booking.customerId, req.userId)) {
+    if (req.userRole === 'customer' &&
+      compareObjectIds(booking.customerId, req.userId)) {
       if (status === 'cancelled') {
         booking.status = status;
         await booking.save();

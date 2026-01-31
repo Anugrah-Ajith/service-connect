@@ -12,6 +12,8 @@ import BookingDetailsPage from './pages/BookingDetailsPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ServiceProviderDashboard from './pages/ServiceProviderDashboard';
 import ServiceProviderProfileSetup from './pages/ServiceProviderProfileSetup';
+import ProfilePage from './pages/ProfilePage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -71,6 +73,22 @@ function App() {
           element={
             <ProtectedRoute requiredRole="service_provider">
               <ServiceProviderProfileSetup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePasswordPage />
             </ProtectedRoute>
           }
         />

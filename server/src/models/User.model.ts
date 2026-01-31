@@ -9,6 +9,9 @@ export interface IUser extends Document {
   phone: string;
   role: 'customer' | 'service_provider';
   isVerified: boolean;
+  profilePhoto?: string;
+  isActive: boolean;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +49,18 @@ const UserSchema = new Schema<IUser>({
     required: true
   },
   isVerified: {
+    type: Boolean,
+    default: false
+  },
+  profilePhoto: {
+    type: String,
+    default: ''
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  isDeleted: {
     type: Boolean,
     default: false
   }

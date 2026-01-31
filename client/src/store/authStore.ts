@@ -5,14 +5,18 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string;
   role: 'customer' | 'service_provider';
   isVerified: boolean;
+  profilePhoto?: string;
+  isActive: boolean;
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   setAuth: (user: User, token: string) => void;
+  updateUser: (user: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -49,6 +53,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   setAuth: (user, token) => {
     saveAuthToStorage(user, token);
     set({ user, token });
+  },
+  updateUser: (updatedFields) => {
+    set((state) => {
+      const newUser = state.user ? { ...state.user, ...updatedFields } : null;
+      if (newUser && state.token) {
+        saveAuthToStorage(newUser, state.token);
+      }
+      return { user: newUser };
+    });
   },
   logout: () => {
     saveAuthToStorage(null, null);

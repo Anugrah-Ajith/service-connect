@@ -19,6 +19,15 @@ A comprehensive platform connecting skilled workers (plumbers, electricians, mec
 - Chatbot to assist customers in describing problems
 - Training partnerships to upskill service providers
 
+### Profile & Account Management
+- **User Profiles**: Comprehensive profiles for both customers and providers
+- **Detailed Info**: Management of name, phone number, and email
+- **Visual Identity**: Profile photo upload and display support
+- **Trust Indicators**: Real-time verification status (Verified/Pending)
+- **Security**: Secure password change functionality
+- **Account Control**: Self-service account deactivation and deletion
+- **Session Management**: Secure logout and persistent authentication state
+
 ## Tech Stack
 
 ### Frontend
@@ -29,6 +38,8 @@ A comprehensive platform connecting skilled workers (plumbers, electricians, mec
 - Zustand for state management
 - Socket.io Client for real-time chat
 - Stripe for payments
+- Lucide React for consistent iconography
+- React Hot Toast for sleek notifications
 
 ### Backend
 - Node.js with Express and TypeScript
@@ -113,6 +124,12 @@ This app addresses several social problems:
 1. Complete a booking as a service provider
 2. As customer, view booking details
 3. Use the payment button to pay (test mode with Stripe)
+
+### 5. Test Profile Management
+1. Click the **Profile Icon** in the navbar header
+2. Select **Update Profile** to change contact details or profile photo
+3. Select **Change Password** to update security credentials
+4. Test **Deactivate Account** (requires confirmation)
 
 ## Troubleshooting
 
