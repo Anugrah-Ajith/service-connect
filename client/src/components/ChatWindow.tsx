@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { Send, MessageCircle } from 'lucide-react';
+import api from '../api/api';
 import { useAuthStore } from '../store/authStore';
 
 interface Message {
@@ -24,6 +25,24 @@ const ChatWindow = ({ bookingId }: ChatWindowProps) => {
   useEffect(() => {
     if (!token || !user) return;
 
+    // Fetch initial messages
+    const fetchMessages = async () => {
+      try {
+        const response = await api.get(`/bookings/${bookingId}/messages`);
+        const formattedMessages = response.data.map((msg: any) => ({
+          bookingId: msg.bookingId,
+          senderId: msg.senderId,
+          message: msg.content,
+          timestamp: new Date(msg.createdAt),
+        }));
+        setMessages(formattedMessages);
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+      }
+    };
+
+    fetchMessages();
+
     const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
       auth: { token },
     });
@@ -33,7 +52,10 @@ const ChatWindow = ({ bookingId }: ChatWindowProps) => {
     });
 
     newSocket.on('new_message', (message: Message) => {
-      setMessages(prev => [...prev, message]);
+      setMessages(prev => [...prev, {
+        ...message,
+        timestamp: new Date(message.timestamp)
+      }]);
     });
 
     newSocket.on('connect_error', (error) => {
@@ -63,16 +85,34 @@ const ChatWindow = ({ bookingId }: ChatWindowProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <MessageCircle className="h-5 w-5 text-primary-600" />
-        <h2 className="text-xl font-semibold text-gray-900">Chat</h2>
+    <div className="flex flex-col h-[600px] bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Chat Header */}
+      <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary-100 p-2 rounded-lg">
+            <MessageCircle className="h-5 w-5 text-primary-600" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-gray-900">Conversation</h2>
+            <div className="flex items-center gap-1.5">
+              <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Live Portal</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4 space-y-4">
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            No messages yet. Start the conversation!
+          <div className="h-full flex flex-col items-center justify-center text-center px-12">
+            <div className="bg-gray-50 p-6 rounded-full mb-4">
+              <MessageCircle className="h-12 w-12 text-gray-200" />
+            </div>
+            <h3 className="text-gray-900 font-bold mb-1">Secure Channel Established</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              Start your conversation with the service professional here. All messages are encrypted and logged for your safety.
+            </p>
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -80,21 +120,20 @@ const ChatWindow = ({ bookingId }: ChatWindowProps) => {
             return (
               <div
                 key={idx}
-                className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
               >
-                <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    isOwn
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  <p>{msg.message}</p>
-                  <p className={`text-xs mt-1 ${
-                    isOwn ? 'text-primary-100' : 'text-gray-500'
-                  }`}>
-                    {new Date(msg.timestamp).toLocaleTimeString()}
-                  </p>
+                <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                  <div
+                    className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${isOwn
+                      ? 'bg-primary-600 text-white rounded-tr-none'
+                      : 'bg-white text-gray-700 border border-gray-100 rounded-tl-none'
+                      }`}
+                  >
+                    {msg.message}
+                  </div>
+                  <span className="text-[10px] font-medium text-gray-400 mt-1.5 px-1 uppercase tracking-tighter">
+                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
               </div>
             );
@@ -103,26 +142,33 @@ const ChatWindow = ({ bookingId }: ChatWindowProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex space-x-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Type a message..."
-          className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-        />
-        <button
-          onClick={handleSend}
-          className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
-        >
-          <Send className="h-5 w-5" />
-          <span>Send</span>
-        </button>
+      {/* Input Area */}
+      <div className="p-4 bg-white border-t border-gray-100">
+        <div className="relative flex items-center bg-gray-50 rounded-xl p-2 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all border border-transparent focus-within:border-primary-100">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            placeholder="Type your message here..."
+            className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-3 py-2 text-gray-700 placeholder-gray-400"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!input.trim()}
+            className="bg-primary-600 text-white p-2.5 rounded-lg hover:bg-primary-700 transition-all active:scale-95 disabled:opacity-40 disabled:grayscale"
+          >
+            <Send className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="text-[9px] text-center text-gray-400 mt-2 font-medium uppercase tracking-widest">
+          Press enter to transmit message
+        </p>
       </div>
     </div>
   );
 };
 
 export default ChatWindow;
+
 

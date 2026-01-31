@@ -4,6 +4,7 @@ import { Booking } from '../models/Booking.model.js';
 import { ServiceProvider } from '../models/ServiceProvider.model.js';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware.js';
 import { compareObjectIds } from '../utils/objectId.js';
+import { Message } from '../models/Message.model.js';
 
 const router = express.Router();
 
@@ -114,12 +115,14 @@ router.get('/:id', authenticate, async (req: AuthRequest, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // Check authorization: Must be the customer OR the user associated with the ServiceProvider profile
-    const isCustomer = compareObjectIds(booking.customerId, req.userId);
+    // Check authorization: Must be the customer OR the provider
+    // Safely extract IDs whether they are strings, ObjectIds, or populated objects
+    const bookingCustomerId = (booking.customerId as any)?._id?.toString() || booking.customerId?.toString();
+    const isCustomer = bookingCustomerId === req.userId;
 
-    // For the provider, we need to check if the User ID of the ServiceProvider profile matches the requesting user's ID
     const providerProfile = booking.serviceProviderId as any;
-    const isProvider = providerProfile && compareObjectIds(providerProfile.userId, req.userId);
+    const providerUserId = providerProfile?.userId?._id?.toString() || providerProfile?.userId?.toString();
+    const isProvider = providerUserId === req.userId;
 
     if (!isCustomer && !isProvider) {
       return res.status(403).json({ message: 'Unauthorized' });
@@ -164,6 +167,32 @@ router.patch('/:id/status', authenticate, async (req: AuthRequest, res) => {
     }
 
     res.status(403).json({ message: 'Unauthorized or invalid status update' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get chat messages for a booking
+router.get('/:id/messages', authenticate, async (req: AuthRequest, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // Authorization: Must be customer or provider
+    const isCustomer = compareObjectIds(booking.customerId, req.userId);
+    const providerProfile = await ServiceProvider.findById(booking.serviceProviderId);
+    const isProvider = providerProfile && compareObjectIds(providerProfile.userId, req.userId);
+
+    if (!isCustomer && !isProvider) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    const messages = await Message.find({ bookingId: req.params.id })
+      .sort({ createdAt: 1 });
+
+    res.json(messages);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

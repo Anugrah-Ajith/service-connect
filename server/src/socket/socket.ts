@@ -10,7 +10,7 @@ interface UserSocket extends Socket {
 export const initializeSocket = (io: Server) => {
   io.use((socket: UserSocket, next) => {
     const token = socket.handshake.auth.token;
-    
+
     if (!token) {
       return next(new Error('Authentication error'));
     }
@@ -36,10 +36,10 @@ export const initializeSocket = (io: Server) => {
     socket.on('join_booking', async (bookingId: string) => {
       try {
         const booking = await Booking.findById(bookingId);
-        
-        if (booking && 
-            (compareObjectIds(booking.customerId, socket.userId) || 
-             compareObjectIds(booking.serviceProviderId, socket.userId))) {
+
+        if (booking &&
+          (compareObjectIds(booking.customerId, socket.userId) ||
+            compareObjectIds(booking.serviceProviderId, socket.userId))) {
           socket.join(`booking_${bookingId}`);
         }
       } catch (error) {
@@ -50,17 +50,27 @@ export const initializeSocket = (io: Server) => {
     // Handle chat messages
     socket.on('send_message', async (data: { bookingId: string; message: string }) => {
       try {
+        const { Message } = await import('../models/Message.model.js');
         const booking = await Booking.findById(data.bookingId);
-        
-        if (booking && 
-            (compareObjectIds(booking.customerId, socket.userId) || 
-             compareObjectIds(booking.serviceProviderId, socket.userId))) {
-          
+
+        if (booking &&
+          (compareObjectIds(booking.customerId, socket.userId) ||
+            compareObjectIds(booking.serviceProviderId, socket.userId))) {
+
+          // Save to database
+          const newMessage = new Message({
+            bookingId: data.bookingId,
+            senderId: socket.userId,
+            content: data.message
+          });
+
+          await newMessage.save();
+
           const messageData = {
             bookingId: data.bookingId,
             senderId: socket.userId,
             message: data.message,
-            timestamp: new Date()
+            timestamp: newMessage.createdAt
           };
 
           // Broadcast to booking room
@@ -75,7 +85,7 @@ export const initializeSocket = (io: Server) => {
     socket.on('update_location', async (data: { bookingId: string; location: { lat: number; lng: number } }) => {
       try {
         const booking = await Booking.findById(data.bookingId);
-        
+
         if (booking && compareObjectIds(booking.serviceProviderId, socket.userId)) {
           // Notify customer of service provider location
           io.to(`user_${booking.customerId}`).emit('location_update', {
