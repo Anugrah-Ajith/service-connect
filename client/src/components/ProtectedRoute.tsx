@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: 'customer' | 'service_provider';
+  requiredRole?: 'customer' | 'service_provider' | 'admin';
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {

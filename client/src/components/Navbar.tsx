@@ -128,6 +128,16 @@ const Navbar = () => {
                       </div>
 
                       <div className="py-1">
+                        {user.role === 'admin' && (
+                          <Link
+                            to="/admin/dashboard"
+                            onClick={() => setIsDropdownOpen(false)}
+                            className="flex items-center px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 font-bold transition-colors"
+                          >
+                            <ShieldCheck className="h-4 w-4 mr-3 text-indigo-500" />
+                            Admin Dashboard
+                          </Link>
+                        )}
                         <Link
                           to="/profile"
                           onClick={() => setIsDropdownOpen(false)}

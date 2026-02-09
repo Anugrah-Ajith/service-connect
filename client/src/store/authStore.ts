@@ -6,7 +6,7 @@ interface User {
   firstName: string;
   lastName: string;
   phone: string;
-  role: 'customer' | 'service_provider';
+  role: 'customer' | 'service_provider' | 'admin';
   isVerified: boolean;
   profilePhoto?: string;
   isActive: boolean;

@@ -10,6 +10,7 @@ import bookingRoutes from './routes/booking.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 import { initializeSocket } from './socket/socket.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 
@@ -35,6 +36,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
