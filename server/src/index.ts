@@ -60,9 +60,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/service-c
   .catch((error) => console.error('MongoDB connection error:', error));
 
 const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+if (process.env.NODE_ENV !== 'production') {
+  httpServer.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 export default app;
 
