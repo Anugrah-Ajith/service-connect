@@ -20,7 +20,13 @@ router.get('/stats', async (req, res) => {
         // Get recent bookings
         const recentBookings = await Booking.find()
             .populate('customerId', 'firstName lastName')
-            .populate('providerId', 'firstName lastName')
+            .populate({
+                path: 'serviceProviderId',
+                populate: {
+                    path: 'userId',
+                    select: 'firstName lastName'
+                }
+            })
             .sort({ createdAt: -1 })
             .limit(5);
 
@@ -65,7 +71,13 @@ router.get('/bookings', async (req, res) => {
     try {
         const bookings = await Booking.find()
             .populate('customerId', 'firstName lastName email')
-            .populate('providerId', 'firstName lastName email')
+            .populate({
+                path: 'serviceProviderId',
+                populate: {
+                    path: 'userId',
+                    select: 'firstName lastName email'
+                }
+            })
             .sort({ createdAt: -1 });
         res.json(bookings);
     } catch (error: any) {

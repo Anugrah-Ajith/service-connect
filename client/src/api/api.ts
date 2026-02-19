@@ -21,7 +21,7 @@ api.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       const message = error.response.data?.message || 'An error occurred';
-      
+
       // Don't show toast for 401 errors (handled by auth redirect)
       if (error.response.status === 401) {
         const { logout } = useAuthStore.getState();
@@ -38,7 +38,7 @@ api.interceptors.response.use(
       // Something else happened
       toast.error('An unexpected error occurred.');
     }
-    
+
     return Promise.reject(error);
   }
 );

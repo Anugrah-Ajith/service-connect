@@ -3,14 +3,10 @@ import api from '../api/api';
 import { toast } from 'react-hot-toast';
 import {
     Users,
-    UserCheck,
     Calendar,
     ShieldCheck,
     Search,
     UserX,
-    MoreVertical,
-    CheckCircle2,
-    XCircle,
     BarChart3,
     Clock,
     ExternalLink,
@@ -58,15 +54,17 @@ interface Booking {
         lastName: string;
         email: string;
     };
-    providerId: {
-        firstName: string;
-        lastName: string;
-        email: string;
+    serviceProviderId: {
+        userId: {
+            firstName: string;
+            lastName: string;
+            email: string;
+        };
     };
     serviceType: string;
     status: string;
     totalAmount: number;
-    bookingDate: string;
+    scheduledDate: string;
 }
 
 const AdminDashboard = () => {
@@ -157,8 +155,8 @@ const AdminDashboard = () => {
                                 key={tab}
                                 onClick={() => { setActiveTab(tab); setLoading(true); }}
                                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === tab
-                                        ? 'bg-neutral-900 text-white shadow-lg scale-105'
-                                        : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
+                                    ? 'bg-neutral-900 text-white shadow-lg scale-105'
+                                    : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
                                     }`}
                             >
                                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -304,8 +302,8 @@ const AdminDashboard = () => {
                                                     </td>
                                                     <td className="px-6 py-7">
                                                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${u.role === 'admin' ? 'bg-indigo-900 text-white' :
-                                                                u.role === 'service_provider' ? 'bg-neutral-900 text-white' :
-                                                                    'bg-neutral-100 text-neutral-600'
+                                                            u.role === 'service_provider' ? 'bg-neutral-900 text-white' :
+                                                                'bg-neutral-100 text-neutral-600'
                                                             }`}>
                                                             {u.role}
                                                         </span>
@@ -404,23 +402,23 @@ const AdminDashboard = () => {
                                                     <td className="px-6 py-7">
                                                         <div className="flex items-center gap-3">
                                                             <div className="flex -space-x-3">
-                                                                <div className="h-10 w-10 rounded-full border-2 border-white bg-indigo-500 text-white flex items-center justify-center text-[10px] font-black uppercase ring-2 ring-neutral-50">{b.customerId.firstName[0]}</div>
-                                                                <div className="h-10 w-10 rounded-full border-2 border-white bg-emerald-500 text-white flex items-center justify-center text-[10px] font-black uppercase ring-2 ring-neutral-50">{b.providerId.firstName[0]}</div>
+                                                                <div className="h-10 w-10 rounded-full border-2 border-white bg-indigo-500 text-white flex items-center justify-center text-[10px] font-black uppercase ring-2 ring-neutral-50">{b.customerId?.firstName?.[0]}</div>
+                                                                <div className="h-10 w-10 rounded-full border-2 border-white bg-emerald-500 text-white flex items-center justify-center text-[10px] font-black uppercase ring-2 ring-neutral-50">{b.serviceProviderId?.userId?.firstName?.[0]}</div>
                                                             </div>
                                                             <span className="text-neutral-500 font-bold text-sm tracking-tighter">Client x Specialist</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-7">
                                                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${b.status === 'completed' ? 'bg-emerald-500 text-white' :
-                                                                b.status === 'pending' ? 'bg-amber-500 text-white' :
-                                                                    'bg-indigo-500 text-white'
+                                                            b.status === 'pending' ? 'bg-amber-500 text-white' :
+                                                                'bg-indigo-500 text-white'
                                                             }`}>
                                                             {b.status}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-7">
                                                         <p className="text-xl font-black text-neutral-900">${b.totalAmount}</p>
-                                                        <p className="text-[10px] text-neutral-400 font-black uppercase tracking-tight">{new Date(b.bookingDate).toLocaleDateString()}</p>
+                                                        <p className="text-[10px] text-neutral-400 font-black uppercase tracking-tight">{new Date(b.scheduledDate).toLocaleDateString()}</p>
                                                     </td>
                                                     <td className="px-10 py-7 text-right">
                                                         <button className="p-4 rounded-2xl bg-neutral-100 text-neutral-600 hover:bg-neutral-900 hover:text-white transition-all shadow-sm">

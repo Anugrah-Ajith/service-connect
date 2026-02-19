@@ -50,6 +50,12 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             <Link
+              to="/"
+              className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Home
+            </Link>
+            <Link
               to="/providers"
               className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >

@@ -154,9 +154,9 @@ const CustomerDashboardPage = () => {
 
                     <div className="text-right">
                       <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full mb-1 ${booking.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                          booking.status === 'confirmed' ? 'bg-blue-500/20 text-blue-400' :
-                            booking.status === 'in_progress' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-dark-700 text-dark-300'
+                        booking.status === 'confirmed' ? 'bg-blue-500/20 text-blue-400' :
+                          booking.status === 'in_progress' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-dark-700 text-dark-300'
                         }`}>
                         {booking.status.replace('_', ' ').toUpperCase()}
                       </span>
