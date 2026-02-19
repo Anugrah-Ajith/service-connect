@@ -4,7 +4,8 @@ import { useAuthStore } from '../store/authStore';
 import api from '../api/api';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
-import { Wrench, ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Logo } from '../components/Logo';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ const LoginPage = () => {
             </Link>
             <div className="flex justify-center mb-4">
               <div className="bg-primary-500/20 p-4 rounded-full">
-                <Wrench className="h-10 w-10 text-primary-500" />
+                <Logo className="h-10 w-10 text-primary-500" />
               </div>
             </div>
             <h2 className="text-3xl font-bold font-heading">
