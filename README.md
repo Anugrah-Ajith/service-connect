@@ -63,7 +63,7 @@ npm run install:all
 ```
 
 2. Set up environment variables:
-   - Create `.env` file in the `server` directory:
+  - Create `.env` file in the `backend` directory:
    ```
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
@@ -83,14 +83,55 @@ The app will be available at:
 - Frontend: http://localhost:5173
 - Backend: http://localhost:5000
 
-## Project Structure
+## Detailed Project Structure
 
-```
-service-connect-app/
-├── client/          # React frontend
-├── server/          # Express backend
-└── README.md
-```
+The application is divided into three main logical sections: **Frontend (Client)**, **Admin**, and **Backend (Server)**.
+
+### 🌐 Frontend Section
+Located in the `frontend/` directory, built with React and Vite.
+
+- **`src/admin/`**:
+  - `HomePage.tsx`: Main landing page
+  - `LoginPage.tsx` / `RegisterPage.tsx`: Authentication pages
+  - `CustomerDashboardPage.tsx`: Dashboard for customers
+  - `BrowseProvidersPage.tsx`: Listing of available service providers
+  - `ProviderProfilePage.tsx`: Individual provider profiles
+  - `CreateBookingPage.tsx`: Booking initiation flow
+  - `MyBookingsPage.tsx`: List of customer's bookings
+  - `BookingDetailsPage.tsx`: Detailed view of a single booking (with chat)
+  - `ServiceProviderDashboard.tsx`: Dashboard for service providers
+  - `ServiceProviderProfileSetup.tsx`: Profile completion for providers
+- **`src/components/`**:
+  - `Navbar.tsx`: Responsive navigation with role-based links
+  - `ChatWindow.tsx`: Real-time messaging interface
+  - `Chatbot.tsx`: Support assistant
+  - `Logo.tsx`: SVG application logo
+  - `ProtectedRoute.tsx`: Route guard for authentication and roles
+
+### 🛡️ Admin Section
+Administrative features are integrated into both the client and server.
+
+- **Frontend**:
+  - `frontend/src/admin/AdminDashboard.tsx`: Comprehensive management interface for users, providers, and bookings.
+- **Backend**:
+  - `backend/src/routes/admin.routes.ts`: Secured API endpoints for administrative operations.
+
+### ⚙️ Backend Section
+Located in the `backend/` directory, built with Node.js, Express, and MongoDB.
+
+- **`src/`**:
+  - `index.ts`: Application entry point and server configuration
+- **`src/models/`**:
+  - `User.model.ts`: User accounts (Customer/Provider/Admin)
+  - `ServiceProvider.model.ts`: Professional profiles and verification
+  - `Booking.model.ts`: Service request records
+  - `Message.model.ts`: Chat history
+  - `Review.model.ts`: Customer feedback
+- **`src/routes/`**: API endpoint definitions (auth, service-providers, bookings, payments, etc.)
+- **`src/socket/`**: Real-time communication logic for chat and notifications
+- **`src/middleware/`**: Authentication, role validation, and error handling
+- **`src/utils/`**: Helper functions and constants
+
 
 ## Social Impact
 
@@ -139,7 +180,7 @@ This app addresses several social problems:
 
 ### Socket.io Connection Issues
 - Check that the backend server is running on port 5000
-- Verify `VITE_SOCKET_URL` in client `.env`
+- Verify `VITE_SOCKET_URL` in frontend `.env`
 
 ### Payment Issues
 - Stripe keys are required for payment functionality
@@ -153,10 +194,10 @@ This app addresses several social problems:
 ## Production Deployment
 
 1. Build the frontend:
-   ```bash
-   cd client
-   npm run build
-   ```
+  ```bash
+  cd frontend
+  npm run build
+  ```
 
 2. Set production environment variables
 3. Use a production MongoDB instance

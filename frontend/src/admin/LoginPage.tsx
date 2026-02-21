@@ -9,7 +9,7 @@ import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
@@ -19,6 +19,16 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation for identifier (Email or 10-digit phone)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+
+    if (!emailRegex.test(formData.identifier) && !phoneRegex.test(formData.identifier)) {
+      toast.error('Please enter a valid email or 10-digit phone number');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -62,22 +72,22 @@ const LoginPage = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-dark-200 mb-1">
-                  Email address
+                <label htmlFor="identifier" className="block text-sm font-medium text-dark-200 mb-1">
+                  Email or Phone Number
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-dark-400" />
                   </div>
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
+                    id="identifier"
+                    name="identifier"
+                    type="text"
                     required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    value={formData.identifier}
+                    onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                     className="block w-full pl-10 pr-3 py-3 border border-dark-600 rounded-xl leading-5 bg-dark-800 text-white placeholder-dark-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 sm:text-sm transition-colors"
-                    placeholder="Enter your email"
+                    placeholder="Enter email or 10-digit phone"
                   />
                 </div>
               </div>
@@ -135,7 +145,7 @@ const LoginPage = () => {
               <p className="text-sm text-dark-300">
                 Don't have an account?{' '}
                 <Link to="/register" className="font-medium text-primary-400 hover:text-primary-300">
-                  Create generic account
+                  Create account
                 </Link>
               </p>
             </div>

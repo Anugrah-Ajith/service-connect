@@ -1,20 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import CustomerDashboardPage from './pages/CustomerDashboardPage';
-import BrowseProvidersPage from './pages/BrowseProvidersPage';
-import ProviderProfilePage from './pages/ProviderProfilePage';
-import CreateBookingPage from './pages/CreateBookingPage';
-import BookingDetailsPage from './pages/BookingDetailsPage';
-import MyBookingsPage from './pages/MyBookingsPage';
-import ServiceProviderDashboard from './pages/ServiceProviderDashboard';
-import ServiceProviderProfileSetup from './pages/ServiceProviderProfileSetup';
-import ProfilePage from './pages/ProfilePage';
-import ChangePasswordPage from './pages/ChangePasswordPage';
-import AdminDashboard from './pages/AdminDashboard';
+import HomePage from './admin/HomePage';
+import LoginPage from './admin/LoginPage';
+import RegisterPage from './admin/RegisterPage';
+import CustomerDashboardPage from './admin/CustomerDashboardPage';
+import BrowseProvidersPage from './admin/BrowseProvidersPage';
+import ProviderProfilePage from './admin/ProviderProfilePage';
+import CreateBookingPage from './admin/CreateBookingPage';
+import BookingDetailsPage from './admin/BookingDetailsPage';
+import MyBookingsPage from './admin/MyBookingsPage';
+import ServiceProviderDashboard from './admin/ServiceProviderDashboard';
+import ServiceProviderProfileSetup from './admin/ServiceProviderProfileSetup';
+import ProfilePage from './admin/ProfilePage';
+import ChangePasswordPage from './admin/ChangePasswordPage';
+import AdminDashboard from './admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {

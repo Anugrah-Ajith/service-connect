@@ -15,7 +15,7 @@ router.post('/register',
     body('password').isLength({ min: 6 }),
     body('firstName').trim().notEmpty(),
     body('lastName').trim().notEmpty(),
-    body('phone').trim().notEmpty(),
+    body('phone').trim().isMobilePhone('any').withMessage('Please enter a valid phone number'),
     body('role').isIn(['customer', 'service_provider'])
   ],
   async (req: Request, res: Response) => {
@@ -74,7 +74,7 @@ router.post('/register',
 // Login
 router.post('/login',
   [
-    body('email').isEmail().normalizeEmail(),
+    body('identifier').notEmpty().withMessage('Email or phone number is required'),
     body('password').notEmpty()
   ],
   async (req: Request, res: Response) => {
@@ -84,9 +84,16 @@ router.post('/login',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, password } = req.body;
+      const { identifier, password } = req.body;
 
-      const user = await User.findOne({ email });
+      // Find user by email OR phone
+      const user = await User.findOne({
+        $or: [
+          { email: identifier.toLowerCase() },
+          { phone: identifier }
+        ]
+      });
+
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -140,7 +147,7 @@ router.put('/profile', authenticate,
   [
     body('firstName').optional().trim().notEmpty(),
     body('lastName').optional().trim().notEmpty(),
-    body('phone').optional().trim().notEmpty(),
+    body('phone').optional().trim().isMobilePhone('any').withMessage('Please enter a valid phone number'),
     body('email').optional().isEmail().normalizeEmail(),
     body('profilePhoto').optional().isString()
   ],
